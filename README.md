@@ -1,4 +1,4 @@
-🏏 AI Sports Analytics Dashboard
+##🏏 AI Sports Analytics Dashboard
 
 An end-to-end AI/ML project that analyzes cricket player performance, segments players using unsupervised learning, predicts performance scores, and helps coaches build optimal teams.
 
