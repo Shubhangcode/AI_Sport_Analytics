@@ -32,8 +32,17 @@ def clean_data(input_path="data/player_stats.csv", output_path="data/player_stat
     
     # Recalculate features to ensure consistency
     df["StrikeRate"] = (df["Runs"] / (df["Dots"] + 1)) * 100
-    df["Economy"] = df["RunsConceded"] / (df["Overs"] + 1)
-    df["PerformanceScore"] = df["Runs"] + (df["Wickets"] * 25)
+    # Calculate Economy Rate (standard formula)
+    df["Economy"] = df.apply(lambda x: (x["RunsConceded"] / x["Overs"]) if x["Overs"] > 0 else 0, axis=1)
+    
+    # Improved PerformanceScore: Incorporates Strike Rate and Economy Impact
+    # Penalty for high economy, bonus for high strike rate
+    df["PerformanceScore"] = (
+        df["Runs"] * 0.5 + 
+        (df["Wickets"] * 20) + 
+        (df["StrikeRate"] * 0.1) - 
+        (df["Economy"] * 5)
+    ).round(2)
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df.to_csv(output_path, index=False)

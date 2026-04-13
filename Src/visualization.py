@@ -39,13 +39,17 @@ def create_3d_cluster_plot(df):
     
     # Improve aesthetics
     fig.update_layout(
-        margin=dict(l=0, r=0, b=0, t=40),
+        margin=dict(l=0, r=0, b=0, t=60),
         scene=dict(
-            xaxis_title='Power (PC1)',
-            yaxis_title='Consistency (PC2)',
-            zaxis_title='Bowling Impact (PC3)'
+            xaxis_title='Batting Index (PC1)',
+            yaxis_title='Bowling Index (PC2)',
+            zaxis_title='Reliability Index (PC3)',
+            xaxis=dict(showgrid=True, zeroline=False),
+            yaxis=dict(showgrid=True, zeroline=False),
+            zaxis=dict(showgrid=True, zeroline=False),
         )
     )
+    fig.update_traces(marker=dict(size=5, opacity=0.8, line=dict(width=1, color='DarkSlateGrey')))
     return fig
 
 if __name__ == "__main__":

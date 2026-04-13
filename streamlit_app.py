@@ -72,14 +72,49 @@ except ModuleNotFoundError as e:
 # Helper function to load data
 @st.cache_data
 def load_and_preprocess_data():
-    file_path = "Data/player_stats.csv"
+    file_path = "data/player_stats.csv"
     if not os.path.exists(file_path):
-        file_path = "data/player_stats.csv"
-        if not os.path.exists(file_path):
-            return None
+        return None
     # Preprocess
     df = clean_data(input_path=file_path, output_path=file_path)
     return df
+
+@st.cache_data
+def get_cached_clusters(df, n_clusters=4):
+    """Perform clustering and assign meaningful archetypes based on data statistics."""
+    clustered_df, kmeans_model, scaler = get_player_clusters(df, n_clusters=n_clusters)
+    
+    # Dynamically assign meaningful names to clusters based on attributes
+    cluster_means = clustered_df.groupby("Cluster")[["Runs", "Wickets"]].mean()
+    overall_runs_mean = df["Runs"].mean()
+    overall_wickets_mean = df["Wickets"].mean()
+    
+    role_map = {}
+    for c in cluster_means.index:
+        r = cluster_means.loc[c, 'Runs']
+        w = cluster_means.loc[c, 'Wickets']
+        # Determine role naming logic strictly by highest relative traits
+        if r > overall_runs_mean * 1.5 and w > overall_wickets_mean * 1.5:
+            role_map[c] = "Elite All-Rounders 🌟"
+        elif r > overall_runs_mean * 1.5:
+            role_map[c] = "Power Hitters 🏏"
+        elif w > overall_wickets_mean * 1.5:
+            role_map[c] = "Strike Bowlers 🎯"
+        elif r > overall_runs_mean * 0.8:
+            role_map[c] = "Solid Middle Order 🛡️"
+        else:
+            role_map[c] = "Rising Prospects 🌱"
+            
+    # Ensure unique mapped names if logic overlaps
+    final_role_map = {}
+    for c, name in role_map.items():
+        if list(role_map.values()).count(name) > 1:
+            final_role_map[c] = f"{name} (Group {c})"
+        else:
+            final_role_map[c] = name
+            
+    clustered_df["Archetype"] = clustered_df["Cluster"].map(final_role_map)
+    return clustered_df, final_role_map
 
 st.title("🤖 AI-Powered Sports Analytics Dashboard")
 st.markdown("A state-of-the-art predictive and analytical toolkit for modern cricket coaching and scouting. Navigate the sidebar to explore data, predict performance, discover similar players, or auto-build a team.")
@@ -144,33 +179,8 @@ if df is not None:
         st.write("Using PCA and K-Means Clustering to group players into functional archetypes based on multi-dimensional statistics.")
         
         # Perform clustering
-        clustered_df, kmeans_model, _ = get_player_clusters(df, n_clusters=4)
-        
-        # Dynamically assign meaningful names to clusters based on attributes
-        cluster_means = clustered_df.groupby("Cluster")[["Runs", "Wickets"]].mean()
-        overall_runs_mean = df["Runs"].mean()
-        overall_wickets_mean = df["Wickets"].mean()
-        
-        role_map = {}
-        for c in cluster_means.index:
-            r = cluster_means.loc[c, 'Runs']
-            w = cluster_means.loc[c, 'Wickets']
-            # Determine role naming logic strictly by highest relative traits
-            if r > overall_runs_mean * 1.1 and w > overall_wickets_mean * 1.1:
-                role_map[c] = "Premium All-Rounders 🌟"
-            elif r > overall_runs_mean * 1.1:
-                role_map[c] = "Aggressive Batsmen 🏏"
-            elif w > overall_wickets_mean * 1.1:
-                role_map[c] = "Specialist Bowlers 🎯"
-            else:
-                role_map[c] = "Bench/Developing Players 🌱"
-                
-        # Ensure unique mapped names if logic overlaps
-        for c, name in role_map.items():
-            if list(role_map.values()).count(name) > 1:
-                role_map[c] = f"{name} (Type {c})"
-                
-        clustered_df["Archetype"] = clustered_df["Cluster"].map(role_map)
+        with st.spinner("Analyzing player archetypes..."):
+            clustered_df, role_map = get_cached_clusters(df, n_clusters=4)
         
         # 3D Plot
         c_cols = st.columns([2, 1])
@@ -219,14 +229,21 @@ if df is not None:
             input_econ = c2.number_input("Bowling Economy", min_value=0.0, value=7.5, step=0.5)
             
             if st.button("🔮 Predict Performance Score"):
-                # Fill missing features with dataset means
+                # Intelligent Feature Filling
                 sample_data = df.mean(numeric_only=True).to_dict()
                 
+                # If predicted runs is very low, assume boundaries are also low
+                if input_runs < 10:
+                    sample_data["Fours"] = 0
+                    sample_data["Sixes"] = 0
+                
                 # Override with user inputs
-                if "Runs" in sample_data: sample_data["Runs"] = input_runs
-                if "StrikeRate" in sample_data: sample_data["StrikeRate"] = input_sr
-                if "Wickets" in sample_data: sample_data["Wickets"] = input_wickets
-                if "Economy" in sample_data: sample_data["Economy"] = input_econ
+                sample_data.update({
+                    "Runs": input_runs,
+                    "StrikeRate": input_sr,
+                    "Wickets": input_wickets,
+                    "Economy": input_econ
+                })
                 
                 sample_df = pd.DataFrame([sample_data])[feature_cols]
                 scaled_sample = scaler.transform(sample_df)
@@ -257,8 +274,8 @@ if df is not None:
         st.header("🤝 Smart Team Builder (Coach Mode)")
         st.write("Generate an optimized squad based on AI clustering, performance metrics, and role composition.")
         
-        # Perform clustering so we have roles
-        clustered_df, _, _ = get_player_clusters(df, n_clusters=4)
+        # Use cached clusters
+        clustered_df, _ = get_cached_clusters(df, n_clusters=4)
         cluster_means = clustered_df.groupby("Cluster")[["Runs", "Wickets"]].mean()
         runs_m, wick_m = df["Runs"].mean(), df["Wickets"].mean()
         
@@ -369,12 +386,16 @@ if df is not None:
                 
                 fig_radar = go.Figure()
                 
-                # Add Target Player
+                # Normalize features safely for radar chart
+                def safe_norm(val, col):
+                    max_val = df[col].max()
+                    return val / max_val if max_val > 0 else 0
+
                 fig_radar.add_trace(go.Scatterpolar(
-                    r=[target_stats["Runs"]/df["Runs"].max(), 
-                       target_stats["Wickets"]/df["Wickets"].max(), 
-                       target_stats["StrikeRate"]/df["StrikeRate"].max(), 
-                       target_stats["PerformanceScore"]/df["PerformanceScore"].max()],
+                    r=[safe_norm(target_stats["Runs"], "Runs"), 
+                       safe_norm(target_stats["Wickets"], "Wickets"), 
+                       safe_norm(target_stats["StrikeRate"], "StrikeRate"), 
+                       safe_norm(target_stats["PerformanceScore"], "PerformanceScore")],
                     theta=['Runs (Norm)', 'Wickets (Norm)', 'Strike Rate (Norm)', 'Performance (Norm)'],
                     fill='toself',
                     name=f"{selected_player} (Target)",
@@ -385,10 +406,10 @@ if df is not None:
                 for i in range(min(2, len(results))):
                     rec = results.iloc[i]
                     fig_radar.add_trace(go.Scatterpolar(
-                        r=[rec["Runs"]/df["Runs"].max(), 
-                           rec["Wickets"]/df["Wickets"].max(), 
-                           rec["StrikeRate"]/df["StrikeRate"].max(), 
-                           rec["PerformanceScore"]/df["PerformanceScore"].max()],
+                        r=[safe_norm(rec["Runs"], "Runs"), 
+                           safe_norm(rec["Wickets"], "Wickets"), 
+                           safe_norm(rec["StrikeRate"], "StrikeRate"), 
+                           safe_norm(rec["PerformanceScore"], "PerformanceScore")],
                         theta=['Runs (Norm)', 'Wickets (Norm)', 'Strike Rate (Norm)', 'Performance (Norm)'],
                         fill='toself',
                         name=rec["Player"]
