@@ -1,100 +1,116 @@
-# 🏏 AI Sports Analytics Dashboard
+# 🏏 AI Sports Analytics Dashboard (Advanced ML Version)
 
-An end-to-end AI/ML project that analyzes cricket player performance, segments players using unsupervised learning, predicts performance scores, and helps coaches build optimal teams.
+An end-to-end AI/ML system for cricket player analysis, segmentation, performance prediction, and intelligent team building — enhanced with improved model accuracy and production-level ML pipeline.
 
 ---
 
-## 🚀 Features
+## 🚀 Overview
+
+This project combines **Machine Learning, Data Science, and Sports Analytics** to help coaches, analysts, and teams make data-driven decisions.
+
+The system processes player performance data, clusters players into meaningful groups, predicts future performance, and recommends optimal team combinations.
+
+---
+
+## 🔥 Key Features
 
 ### 📊 Data Overview
 
-* Summary of player dataset
-* Key statistics (Runs, Wickets, Strike Rate, Economy)
+* Dataset summary and statistics
 * Interactive visualizations using Plotly
+* Distribution and correlation analysis
 
 ---
 
-### 🧠 Player Segmentation (Clustering)
+### 🧠 Player Segmentation (Unsupervised Learning)
 
 * PCA for dimensionality reduction
-* KMeans clustering to group players
-* 3D interactive visualization of player clusters
-* Identify player types (batsman, bowler, all-rounder)
+* KMeans clustering for grouping players
+* 3D visualization of player clusters
+* Identifies player roles:
+  * Batsmen
+  * Bowlers
+  * All-rounders
 
 ---
 
-### 🔮 Performance Prediction
+### 🔮 Advanced Performance Prediction (Improved)
 
-* Machine Learning regression model
-* Predicts player performance score
-* Takes inputs like runs, wickets, strike rate, economy
+* Upgraded ML models (Random Forest / Gradient Boosting)
+* Feature scaling and normalization
+* Enhanced feature engineering:
+  * Batting impact
+  * Bowling efficiency
+  * Player consistency
+* Realistic and stable predictions
+* Evaluated using:
+  * R² Score
+  * Mean Absolute Error (MAE)
 
 ---
 
 ### 🤝 Similar Player Recommendation
 
-* Uses cosine similarity
+* Cosine similarity-based recommendation system
 * Finds players with similar performance profiles
-* Useful for replacements and scouting
+* Useful for scouting and replacements
 
 ---
 
 ### 🏏 Team Builder (Coach Mode)
 
 * Select team strategy:
-
   * Batting-focused
   * Bowling-focused
   * Balanced
-* Automatically generates optimal team
-* Based on performance + clustering
+* AI selects optimal team based on:
+  * Performance score
+  * Player roles
+  * Cluster distribution
+* Provides explanation for selections
 
 ---
 
 ## 🧠 Tech Stack
 
-* Python
-* Pandas, NumPy
-* Scikit-learn (PCA, KMeans, Regression)
-* Plotly (visualization)
-* Streamlit (web app)
+* **Python**
+* **Pandas, NumPy** (Data Processing)
+* **Scikit-learn** (ML Models, PCA, Clustering)
+* **Plotly** (Visualization)
+* **Streamlit** (Web App)
 
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 AI-Sports_Analytics/
 │
 ├── data/
 │   └── player_stats.csv
 │
 ├── Src/
-│   ├── preprocess.py
-│   ├── clustering.py
-│   ├── prediction.py
-│   └── recommendation.py
+│   ├── preprocess.py        # Data cleaning & feature engineering
+│   ├── clustering.py        # PCA + KMeans
+│   ├── prediction.py        # ML model (improved)
+│   └── recommendation.py    # Similarity system
 │
-├── streamlit_app.py
+├── streamlit_app.py         # Main app
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## ⚙️ How It Works
+## ⚙️ ML Pipeline
 
-1. Raw cricket data is preprocessed
-2. Features like strike rate, economy are engineered
-3. PCA reduces feature dimensions
-4. KMeans groups players into clusters
-5. Regression model predicts performance score
-6. Similarity model recommends players
-7. Streamlit app visualizes everything
+```text
+Raw Data → Preprocessing → Feature Engineering → Scaling → PCA → Clustering → Prediction → Recommendation → Streamlit App
+```
 
 ---
 
-## ▶️ Run Locally
+## ▶️ How to Run Locally
 
 ```bash
 pip install -r requirements.txt
@@ -107,30 +123,47 @@ streamlit run streamlit_app.py
 
 Deployed using Streamlit Community Cloud
 
-👉 Live App: *(https://aisportanalytics.streamlit.app/)*
+👉 **Live App:** [https://aisport-wtxwjmfvylvvnpdbuv5wkt.streamlit.app/](https://aisport-wtxwjmfvylvvnpdbuv5wkt.streamlit.app/)
+
+---
+
+## 📊 Model Improvements (Latest Update)
+
+* Replaced basic model with advanced ML algorithms (Random Forest)
+* Added feature scaling and normalization
+* Improved feature engineering for realistic outputs
+* Handled outliers and noisy data
+* Ensured consistent pipeline across all modules
+* Fixed all GitHub and runtime errors (including `KeyError` & `Unicode` fixes)
+* Improved prediction stability and reliability
 
 ---
 
 ## 📌 Use Cases
 
-* Team selection for coaches
+* Cricket team selection
 * Player performance analysis
 * Talent scouting
+* Strategy building for coaches
 * Sports analytics research
 
 ---
 
-## 📈 Future Improvements
+## 📈 Future Enhancements
 
 * Real-time match data integration
-* Deep learning models
-* Player injury prediction
+* Deep learning-based prediction models
 * Match outcome prediction
+* Player injury risk analysis
 
 ---
 
 ## 👨‍💻 Author
 
-Shubhang Trivedi
+Shubhang
 
+---
 
+## ⭐ Support
+
+If you found this project useful, give it a ⭐ on GitHub!
