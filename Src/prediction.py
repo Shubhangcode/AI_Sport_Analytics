@@ -28,7 +28,7 @@ def train_performance_model(df):
     return model, scaler, mae, r2, X.columns
 
 if __name__ == "__main__":
-    df = pd.read_csv("../Data/player_stats.csv")
+    df = pd.read_csv("../data/player_stats.csv")
     model, scaler, mae, r2, _ = train_performance_model(df)
     print(f"Random Forest MAE: {mae:.2f}")
     print(f"Random Forest R2: {r2:.2f}")

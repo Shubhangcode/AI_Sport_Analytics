@@ -50,7 +50,7 @@ def create_3d_cluster_plot(df):
 
 if __name__ == "__main__":
     from clustering import get_player_clusters
-    df = pd.read_csv("../Data/player_stats.csv")
+    df = pd.read_csv("../data/player_stats.csv")
     df, _, _ = get_player_clusters(df)
     fig = create_3d_cluster_plot(df)
     fig.show()

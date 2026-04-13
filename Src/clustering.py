@@ -17,6 +17,6 @@ def get_player_clusters(df, n_clusters=4):
     return df_result, kmeans, scaler
 
 if __name__ == "__main__":
-    df = pd.read_csv("../Data/player_stats.csv")
+    df = pd.read_csv("../data/player_stats.csv")
     clustered_df, _, _ = get_player_clusters(df)
     print(clustered_df[["Player", "Cluster"]].head())

@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-def clean_data(input_path="Data/player_stats.csv", output_path="Data/player_stats.csv"):
+def clean_data(input_path="data/player_stats.csv", output_path="data/player_stats.csv"):
     try:
         df = pd.read_csv(input_path)
     except FileNotFoundError:
@@ -37,7 +37,7 @@ def clean_data(input_path="Data/player_stats.csv", output_path="Data/player_stat
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df.to_csv(output_path, index=False)
-    print("✅ Preprocessing Done")
+    print("Preprocessing Done")
     return df
 
 if __name__ == "__main__":
