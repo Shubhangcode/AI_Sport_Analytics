@@ -28,7 +28,7 @@ class PlayerRecommender:
         result_df = self.df.iloc[similar_indices].copy()
         result_df["SimilarityScore"] = similarity_scores[similar_indices].round(3) * 100
         
-        columns_to_show = ["Player", "Runs", "Wickets", "StrikeRate", "Economy", "SimilarityScore"]
+        columns_to_show = ["Player", "Runs", "Wickets", "StrikeRate", "Economy", "PerformanceScore", "SimilarityScore"]
         return result_df[[col for col in columns_to_show if col in result_df.columns]]
 
     def get_similarity(self, player1, player2):
